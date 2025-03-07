@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة التقدير المطلوب</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        input, button {
+            margin: 10px;
+            padding: 10px;
+            width: 80%;
+        }
+        #result {
+            font-size: 18px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h2>حاسبة التقدير المطلوب</h2>
+    <input type="number" id="year1" placeholder="أدخل تقدير السنة الأولى">
+    <input type="number" id="year2" placeholder="أدخل تقدير السنة الثانية">
+    <input type="number" id="year3" placeholder="أدخل تقدير السنة الثالثة">
+    <input type="number" id="semester1" placeholder="أدخل تقدير الترم الأول للسنة الرابعة">
+    <input type="number" id="target" placeholder="أدخل التقدير النهائي المطلوب">
+    <button onclick="calculateRequiredGrade()">احسب</button>
+    <p id="result"></p>
+
+    <script>
+        function calculateRequiredGrade() {
+            let year1 = parseFloat(document.getElementById("year1").value) || 0;
+            let year2 = parseFloat(document.getElementById("year2").value) || 0;
+            let year3 = parseFloat(document.getElementById("year3").value) || 0;
+            let semester1 = parseFloat(document.getElementById("semester1").value) || 0;
+            let target = parseFloat(document.getElementById("target").value);
+
+            if (isNaN(target) || target < 0 || target > 100) {
+                document.getElementById("result").innerHTML = "❌ أدخل التقدير النهائي المطلوب بشكل صحيح!";
+                return;
+            }
+
+            let requestData = {
+                year1: year1,
+                year2: year2,
+                year3: year3,
+                semester1: semester1,
+                target: target
+            };
+
+            fetch("http://127.0.0.1:8000/calculate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("result").innerHTML = data.message;
+            })
+            .catch(error => {
+                document.getElementById("result").innerHTML = "❌ حدث خطأ أثناء الحساب!";
+            });
+        }
+    </script>
+</body>
+</html>
